@@ -25,13 +25,6 @@ app.use('/static', express.static('public'));
 // Body parser
 app.use(bodyParser.json())
 
-// // Check for admin
-// app.use((req, res, next) => {
-//   const User = require('./models/user')
-//   console.log(User.model)
-//   next()
-// })
-
 // Router
 app.use( '/api', require('./routes/user') )
 
@@ -54,14 +47,14 @@ mongoose.connection.on('disconnected', () => {
   })
 })
 
-process.on('SIGTERM', () => {
-  console.info('SIGTERM signal received!')
-  console.log('Http server closing...')
-  server.close(() => {
-    console.log("Http server closed!")
-    mongoose.connection.close(false, () => {
-      console.log("MongoDB connection closed!")
-      process.exit(0)
-    })
-  })
-})
+// process.on('SIGTERM', () => {
+//   console.info('SIGTERM signal received!')
+//   console.log('Http server closing...')
+//   server.close(() => {
+//     console.log("Http server closed!")
+//     mongoose.connection.close(false, () => {
+//       console.log("MongoDB connection closed!")
+//       process.exit(0)
+//     })
+//   })
+// })
