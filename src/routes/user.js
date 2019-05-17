@@ -2,80 +2,113 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 
+const { check, validationResult } = require('express-validator/check');
+
 // Get limited users
 router.get('/user', (req, res, next) => {
   if( req.query.limit ) {
-    User.find( {} )
-      .limit( parseInt(req.query.limit) )
-      .exec((err, users) => {
-        if( !err ) {
-          res.send(users)
-        }
+    User.findOne({ _id: req.user._id })
+      .exec((err, user) => {
+        if( err ) return next({ message: err.message })
+        if( !user ) return next({ status: 401, message: 'Token-ul de autentificare este invalid.' })
+        else
+          User.find( {} )
+            .limit( parseInt(req.query.limit) )
+            .exec((err, users) => {
+              if( err ) return next({ message: err.message })
+              if( !users ) return res.json({ status: 200, message: 'Nu exista utilizatori.' })
+              res.json( { users })
+            })
       })
+  } else {
+    //console.log("USER: ", req.user)
+    return next({ message: 'Nu exista informatii suficiente pentru aceasta cerere.' })
   }
 })
+
 // Get user by id 
 router.get('/user/:id', (req, res, next) => {
-  let paramID = req.params.id 
-
-  User.findOne({_id: paramID})
+  User.findOne({ _id: req.params.id })
     .exec((err, user) => {
-      if( err ) return res.status(422).send({error: "Nu s-au putut procesa informatiile."})
+      console.log("GET_ID: ", user)
+      if( err ) return next({ message: "Nu s-au putut procesa informatiile." })
       if( !user ) 
-        res.send({error: `Utilizatorul cu id-ul ${paramID} nu exista in baza de date.`})
-      else res.send(user)
+        return next({ status: 200, message: `Utilizatorul cu id-ul ${req.params.id} nu exista in baza de date.` })
+      else return res.json(user)
     })
 })
+
 // Get user by email
 router.get('/userByEmail/:email', (req, res, next) => {
   User.findOne({email: req.params.email})
     .exec((err, user) => {
       if( !err ) {
-        if( !user ) 
-          res.send({error: `Utilizatorul cu email-ul ${req.params.email} nu exista in baza de date.`})
-        else res.send(user)
+        if( !user ) return next({ status: 200, error: `Utilizatorul cu email-ul ${req.params.email} nu exista in baza de date.` })
+        else return res.json(user)
       }
     })
 })
+
 // Post new user JSON
 router.post('/user', (req, res, next) => {
-  if( req.body.isAdmin ) return res.send({error: `Nu aveti permisiunea de a adauga un admin.`})
+  // const errors = validationResult(req);
+  // if ( !errors.isEmpty() ) return res.status(422).json({ errors: errors.array() });
+  // if( req.body.isAdmin ) return res.json({error: `Nu aveti permisiunea de a adauga un admin.`})
   User.findOne({email: req.body.email})
     .exec((err, user) => {
-      if( err ) return res.send({error: err.message})
+      if( err ) return next({ message: err.message })
       if( !user ) {
-        User.create(req.body, (err, doc) => {
-          if( err ) return res.send({error: err.message})
-          return res.send(doc)
-        })
-      } else return res.send({error: `Utilizatorul cu emailul ${req.body.email} exista deja in baza de date.`})
+        User.findOne({ _id: req.user._id }).exec((err, user) => { 
+          if( err ) next(err);
+          if( req.body.isAdmin && !user.isAdmin ) return next({ status: 403, message: 'Permisiune restrictionata.' })
+          else 
+            User.create(req.body, (err, doc) => {
+              if( err ) {
+                return next({ message: err.message })
+              }
+              return res.json(doc)
+            })
+         });
+      } else return next({ status: 200, message: `Utilizatorul cu emailul ${req.body.email} exista deja in baza de date.`})
     })
 })
+
 // Update an existing user
 router.put('/user/:id', (req, res, next) => {
+  // const errors = validationResult(req)
+  // if( req.body.email !== '' || req.body.password !== '' )
+  //   if( !errors.isEmpty() ) return next({ errors: errors.array() })
   let paramID = req.params.id
   if( !req.body.email ) delete req.body.email // Prevent updating an empty email
-  
-  User.findOne({email: req.body.email})
+  User.findOne({ _id: req.user._id })
     .exec((err, user) => {
       if( err ) {
-        console.log('Error message: ', err.message)
-        return res.status(500).send({error: err.message})
+        console.log('Error message: ', err.stack)
+        return next({ message: err.message })
       }
-      if( user ) return res.send({error: `Utilizatorul cu email-ul ${req.body.email} exista deja.`})
+      if( !user ) 
+        return next({ status: 401, message: 'Token-ul de autentificare este invalid.' })
+      else if( !user.isAdmin && req.body.isAdmin ) 
+        return next({ status: 403, message: `Nu aveti permisiunea de a seta un utilizator ca fiind admin.` })
       else {
-        User.findOneAndUpdate({_id: paramID}, req.body)
-          .then(() => {
-            User.findOne({_id: paramID}, (err, user) => {
-              if( err ) return res.send({error: err.message})
-              if( !user ) return res.send({error: `Utilizatorul cu id-ul ${paramID} nu exista in baza de date.`})
-              return res.send(user)
-            })
-          })
-          .catch(err => {
-            res.status(422).send({error: "Nu s-au putut procesa informatiile."})
-            console.log("Error message: ", err.message)
-          })
+        User.findOne({_id: paramID}, (err, user) => {
+          if( err ) return next({ message: err.message })
+          if( !user ) 
+            return next({ status: 200, message: `Utilizatorul cu id-ul ${paramID} nu exista in baza de date.` })
+          else {
+            User.findOneAndUpdate({_id: paramID}, req.body, { returnNewDocument: true })
+              .exec((err, user) => {
+                if( err ) {
+                  if( err.codeName === 'DuplicateKey' )
+                    return next({ status: 200, message: `Utilizatorul cu email-ul ${req.body.email} exista deja.` })
+                  else
+                    return next({ message: err.message })
+                } else {
+                  return res.json(user)
+                }
+              })
+          }
+        })
       }
     })
 })
@@ -83,19 +116,46 @@ router.put('/user/:id', (req, res, next) => {
 router.delete('/user/:id', (req, res, next) => {
   let paramID = req.params.id
 
-  User.findOneAndDelete({_id: paramID}).then(doc => {
-    if( !doc ) return res.send({error: `Utilizatorul cu id-ul ${paramID} nu exista.`})
-    return res.send({
-      user: doc, 
-      message: `Utilizatorul cu id-ul ${paramID} a fost sters cu succes.`
+  // Check TOKEN if is valid
+  User.findOne({ _id: req.user._id })
+    .exec((err, user) => {
+      if( err ) return next({ message: err.message })
+      if( !user ) 
+        return next({ status: 401, message: 'Token-ul de autentificare este invalid.' })
+      else if( !user.isAdmin ) {
+        User.findOne({ _id: paramID })
+          .exec((err, user) => {
+            if( err ) return next({ status: err.status, message: err.message })
+            if( !user ) 
+              return next({ status: 200, message: `Utilizatorul cu id-ul ${paramID} nu exista.` })
+            else if( user.isAdmin ) 
+              return next({ status: 403, message: 'Nu aveti permisiunea de a sterge acest utilizator.' })
+            else 
+              User.findOneAndDelete({_id: paramID}).then(user => {
+                return res.json({
+                  user: user, 
+                  message: `Utilizatorul cu id-ul ${paramID} a fost sters cu succes.`
+                })
+              }).catch(err => {
+                next({ message: "Nu s-au putut procesa informatiile." })
+              })
+          })
+      } else 
+        User.findOneAndDelete({_id: paramID}).then(user => {
+          return res.json({
+            user: user, 
+            message: `Utilizatorul cu id-ul ${paramID} a fost sters cu succes.`
+          })
+        }).catch(err => {
+          next({ message: "Nu s-au putut procesa informatiile." })
+        })
     })
-  }).catch(err => {
-    res.status(422).send({error: "Nu s-au putut procesa informatiile."})
-    console.log("Error message: ", err.message)
-  })
+  
 })
 
 module.exports = router
+
+
 
 
 
