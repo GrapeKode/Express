@@ -2,29 +2,18 @@ const express = require('express')
 const path = require('path')
 const port = process.env.port || 3000
 const bodyParser = require('body-parser')
-const passport = require('passport')
-const config = require('./config')
 // MongoDB
 const mongoose = require('mongoose')
+const mongoURI = 'mongodb://localhost:27017/user'
 
 const app = express()
 
-// Models
-const UserModel = require('./models/user')
-
 // Connect to mongoDB
-mongoose.connect(config.mongoURI + '/user', { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }, (err) => {
+mongoose.connect(mongoURI, { useNewUrlParser: true }, (err) => {
   if( err ) throw err;
   console.log('Mongoose connected!')
 })
 mongoose.Promise = global.Promise
-
-require('./auth/auth')
-
-// Router
-const routes = require('./routes/routes')
-const user = require('./routes/user')
-const secureRoute = require('./routes/secure-routes')
 
 // View Engine Pug = HTML framework
 app.set("views", path.join(__dirname, 'views'));
@@ -34,21 +23,15 @@ app.set("view engine", "pug");
 app.use('/static', express.static('public'));
 
 // Body parser
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-// Routers
-app.use( '/api', passport.authenticate('jwt', { session: false }), user )
-app.use( '/auth', routes ) // Register & login
-app.use( '/', passport.authenticate('jwt', { session: false }), secureRoute)
-
+// Router
+app.use( '/api', require('./routes/user') )
 
 // Error handler middleware
 app.use((err, req, res, next) => {
-  console.log("-----------------------------------------------------------------");
-  console.log("__Middleware ERROR__ \n", err)
-  console.log("-----------------------------------------------------------------");
-
-  res.status(err.status || 500).json({ error: err })
+  res.status(422).send({error: err.message})
+  next()
 })
 
 const server = app.listen( port, () => console.info(`Server has started on port ${port}`) );
