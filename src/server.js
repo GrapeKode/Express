@@ -41,7 +41,6 @@ app.use( '/api', passport.authenticate('jwt', { session: false }), user )
 app.use( '/auth', routes ) // Register & login
 app.use( '/', passport.authenticate('jwt', { session: false }), secureRoute)
 
-
 // Error handler middleware
 app.use((err, req, res, next) => {
   console.log("-----------------------------------------------------------------");
