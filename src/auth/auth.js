@@ -51,11 +51,11 @@ passport.use('jwt', new JWTstrategy({
     let cache_token = cache.get(token.user._id)
 
     if( !cache_token ) 
-      return done(null, false, { message: 'Authentication failed' })
+      return done(null, false, { status: 401, message: 'Authentication failed' })
     else {
       let cache_iat = jwt.decode(cache_token).iat
       if( cache_iat !== token.iat )
-        return done(null, false, { message: 'Authentication failed' })
+        return done(null, false, { status: 401, message: 'Authentication failed' })
       return done(null, token.user)
     }
   } catch( err ) {

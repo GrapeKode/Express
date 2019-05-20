@@ -62,4 +62,18 @@ router.post('/login', async (req, res, next) => {
   })(req, res, next)
 })
 
+// Logout
+router.get('/logout', async (req, res, next) => {
+  passport.authenticate('jwt', async (err, user, info) => {
+    try {
+      if( err || !user ) return res.sendStatus(401)
+      let token = await jwt.decode(req.header('x-auth'))
+      cache.del(token.user._id)
+      return res.json({ user: token.user, message: 'Logged out' })
+    } catch( err ) {
+      next( err )
+    }
+  })(req, res, next)
+})
+
 module.exports = router
