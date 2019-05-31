@@ -10,7 +10,7 @@ const { check, validationResult } = require('express-validator/check');
 // Get limited users
 router.get('/user', (req, res, next) => {
   if( req.query.limit ) {
-    User.find({})
+    User.find({}, { password: 0 })
       .limit( parseInt(req.query.limit) )
       .exec((err, users) => {
         if( err ) return next( err )
@@ -35,7 +35,7 @@ router.get('/user/:id', (req, res, next) => {
    * verifica ca id-ul sa aiba lungimea specifica de 24 de caractere.
    */
   if( req.params.id.length !== req.user._id.length ) 
-    return next({ status: 400, message: `Id-ul ${req.params.id} este incorect` })
+    return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
   User.findOne({ _id: req.params.id })
     .exec((err, user) => {
@@ -65,7 +65,7 @@ router.post('/user', (req, res, next) => {
   // if ( !errors.isEmpty() ) return res.status(422).json({ errors: errors.array() });
   // if( req.body.isAdmin ) return res.json({error: `Nu aveti permisiunea de a adauga un admin.`})
   User.findOne({email: req.body.email})
-    .exec((err, user) => {
+    .exec(async (err, user) => {
       if( err ) return next( err )
       if( user ) 
         return next({ status: 200, message: `Utilizatorul cu emailul ${req.body.email} exista deja in baza de date` })
@@ -73,7 +73,7 @@ router.post('/user', (req, res, next) => {
         if( req.body.isAdmin && !req.user.isAdmin ) 
           return next({ status: 403, message: 'Permisiune restrictionata' })
         else 
-          User.create(req.body, (err, doc) => {
+          await User.create(req.body, (err, doc) => {
             if( err ) 
               return next( err )
             if( !doc ) return next({ message: 'Nu s-au putut procesa informatiile' })
@@ -86,7 +86,7 @@ router.post('/user', (req, res, next) => {
 // Update an existing user
 router.put('/user/:id', (req, res, next) => {
   if( req.params.id.length !== req.user._id.length ) 
-    return next({ status: 400, message: `Id-ul ${req.params.id} este incorect` })
+    return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
   // const errors = validationResult(req)
   // if( req.body.email !== '' || req.body.password !== '' )
@@ -135,7 +135,7 @@ router.put('/user/:id', (req, res, next) => {
 
 router.delete('/user/:id', (req, res, next) => {
   if( req.params.id.length !== req.user._id.length ) 
-    return next({ status: 400, message: `Id-ul ${req.params.id} este incorect` })
+    return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
   User.findOne({ _id: req.params.id })
     .exec((err, user) => {

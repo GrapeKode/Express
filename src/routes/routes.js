@@ -43,7 +43,7 @@ router.post('/login', async (req, res, next) => {
         const token = jwt.sign({ user: body }, config.secret.privateKEY, config.secret.signOptions ) // { payLoad, privateKEY, signOptions } 
 
         // Add the token to whitelist
-        cache.put(user._id, token)
+        cache.put(user._id, token, 43200000)
         // let cache_jwt = cache.get(user._id)
         // // Replace old token
         // if( !cache_jwt )

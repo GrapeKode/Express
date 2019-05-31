@@ -30,9 +30,9 @@ passport.use('login', new localStrategy({
 }, async (email, password, done) => {
   try {
     const user = await UserModel.findOne({ email: email })
-    if( !user ) return done(null, false, { status: 404, message: 'User not found' })
+    if( !user ) return done(null, false, { status: 404, message: 'Wrong email or password' })
     const validate = await user.isValidPassword( password )
-    if( !validate ) return done(null, false, { status: 400, message: 'Wrong password'})
+    if( !validate ) return done(null, false, { status: 400, message: 'Wrong email or password'})
     return done(null, user, { message: 'Logged in Successfully'})
   } catch( error ) {
     return done( error )

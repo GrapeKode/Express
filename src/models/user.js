@@ -1,8 +1,16 @@
 const mongoose = require('mongoose')
 const config = require('../config')
-const db = mongoose.createConnection(config.mongoURI + '/user', { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true })
+const db = mongoose.createConnection(
+  config.mongoURI + '/user', 
+  { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }
+)
+const conn = mongoose.connection
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
+const crypto = require('crypto')
+const path = require('path')
+const fs = require('fs')
+const assert = require('assert')
 
 const UserSchema = new Schema({
   email: {
@@ -25,6 +33,10 @@ const UserSchema = new Schema({
   isAdmin: {
     type: Boolean,
     default: false
+  },
+  imageID: {
+    type: String,
+    default: null
   }
 })
 
@@ -56,17 +68,47 @@ const user = new User({
   isAdmin: true
 })
 
-db.once('connected', async (err) => {
+let defaultImagePath = './public/img/profile-img.jpg'
+
+db.on('connected', async (err) => {
   if( err ) return console.error( err )
+  // Check if there is an admin
   await User.countDocuments({isAdmin: true}, async (err, count) => {
-    if( err ) console.log(err.stack)
+    if( err ) return console.log(err.stack)
     if( !count ) {
       await User.create(user, async (err, doc) => {
         if( err ) return console.error( err )
-        console.log(doc)
-        return db.close()
+        // console.log(doc)
+        console.log('USER: __OK__')
+        // return db.close()
       })
     }
+    // Check if there is an image
+    const conn = mongoose.connection
+    const Grid = require('gridfs-stream')
+    const gfs = Grid(conn.db, mongoose.mongo)
+    gfs.collection('images')
+    await gfs.files.find({}).toArray( async (err, files) => {
+      if( err ) return console.log( err.stack )
+      if( !files[0] ) {
+        await crypto.randomBytes(16, async (err, buf) => {
+          if( err ) console.log( err.stack )
+          const source = fs.createReadStream(defaultImagePath)
+          const fileName = buf.toString('hex') + path.extname('profile-img.jpg');
+          const target = gfs.createWriteStream({ 
+            filename: fileName, 
+            content_type: 'image/jpeg', 
+            root: 'images' 
+          })
+          let file = source.pipe(target)
+          User.updateMany({ imageID: null }, { $set: { imageID: file.id } }, { multi: true }, (err, doc) => {
+            if( err ) return console.log( err.stack )
+            if( !doc.ok ) return console.log('Error updating user image\n', doc)
+            console.log('IMAGE: __OK__\n', doc)
+          })
+        })
+      }
+    })
   })
 })
 
