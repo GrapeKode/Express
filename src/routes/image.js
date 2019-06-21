@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const cache = require('memory-cache')
 const crypto = require('crypto');
 const path = require('path');
+const passport = require('passport')
 mongoose.connect(
   config.mongoURI + '/user', 
   { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }
@@ -63,7 +64,7 @@ const storage = new GridFsStorage({
 const upload = multer({ storage });
 
 //  GET limited images
-router.get('/image', (req, res, next) => {
+router.get('/image', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   if( req.query.limit ) {
     let filesData = [],
         count = 0;
@@ -71,7 +72,7 @@ router.get('/image', (req, res, next) => {
       if( err ) return next( err )
       if( !files || files.length === 0 ) return next({ status: 404, message: 'Nu s-au gasit imagini.' })
       for(let file of files) {
-        console.log('----------- File[', count ,'] ---------\n', file)
+        // console.log('----------- File[', count ,'] ---------\n', file)
         if( count === parseInt(req.query.limit) ) break;
         filesData.push({ 
           filename: file.filename,
@@ -87,8 +88,56 @@ router.get('/image', (req, res, next) => {
   }
 })
 
+// GET image By User ID
+router.get('/image/:id', passport.authenticate('jwt', { session: false }), (req, res, next) => {
+  if( req.params.id.length !== 24 ) 
+    return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
+
+  if( req.params.id ) {
+    gfs.files.find({}).toArray((err, files) => {
+      if( err ) return next( err )
+      if( !files || files.length === 0 )
+        return next({ status: 404, message: `Imaginea cu id-ul ${req.params.id} n-a fost gasita` })
+      for(let file of files) {
+        if( file._id == req.params.id ) {
+          return res.json(file)
+        }
+      }
+      return next({ status: 404, message: `Imaginea cu id-ul ${req.params.id} n-a fost gasita` })
+    })
+  } else {
+    return next({ status: 404, message: 'Nu exista informatii suficiente pentru aceasta cerere' })
+  }
+})
+
+// GET image By FileName
+router.get('/image/full/:filename', (req, res, next) => {
+  if( req.params.filename ) {
+    gfs.files.find({}).toArray((err, files) => {
+      if( err ) return next( err )
+      if( !files || files.length === 0 )
+        return next({ status: 404, message: `Imaginea n-a fost gasita` })
+      for(let file of files) {
+        if( file.filename == req.params.filename ) {
+          // Create read stream
+          let readstream = gfs.createReadStream({
+              filename: file.filename,
+              root: "images"
+          });
+          // Set the proper content type 
+          res.set('Content-Type', file.contentType)
+          return readstream.pipe(res);
+        }
+      }
+      return next({ status: 404, message: `Imaginea n-a fost gasita` })
+    })
+  } else {
+    return next({ status: 404, message: 'Nu exista informatii suficiente pentru aceasta cerere' })
+  }
+})
+
 // GET image By ID
-router.get('/image/:id', (req, res, next) => {
+router.get('/image/show/:id', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   if( req.params.id.length !== 24 ) 
     return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
@@ -117,7 +166,8 @@ router.get('/image/:id', (req, res, next) => {
 })
 
 // POST new image
-router.post('/image', upload.single('profile'), (req, res, next) => {
+router.post('/image', passport.authenticate('jwt', { session: false }), upload.single('profile'), (req, res, next) => {
+  // console.log('REQ_file:', req.file)
   User.findOneAndUpdate({ _id: req.user._id }, { imageID: req.file.id }, { returnNewDocument: true })
     .exec((err, doc) => {
       if( err) return next( err )
@@ -128,7 +178,7 @@ router.post('/image', upload.single('profile'), (req, res, next) => {
 })
 
 // DELETE image By ID
-router.delete('/image/:id', (req, res, next) => {
+router.delete('/image/:id', passport.authenticate('jwt', { session: false }), (req, res, next) => {
   if( req.params.id.length !== 24 ) 
     return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
@@ -144,24 +194,44 @@ router.delete('/image/:id', (req, res, next) => {
     gfs.exist({ _id: req.params.id, root: 'images' }, async (err, found) => {
       if( err ) return next( err )
       if( !found ) return next({ status: 404, message: `Imaginea cu id-ul ${req.params.id} n-a fost gasita` })
-      await gfs.remove({ _id: req.params.id, root: 'images' }, async err => {
+      await gfs.files.find({}).toArray(async (err, files) => {
         if( err ) return next( err )
-        await gfs.files.find({}).toArray(async (err, files) => {
-          if( err ) return next( err )
-          if( files[0] ) {
-            let id = files[0]._id
-            let batch = conn.collection('user').initializeUnorderedBulkOp()
-            batch.find({ imageID: req.params.id }).update({ $set: { imageID: id } })
-            await batch.execute(async (err, doc) => {
-              if( err ) return next( err )
-              console.log('nModified:', doc.nModified)
+        for(let file of files) {
+          if( file._id == req.params.id ) {
+            if( file.metadata == 'default' ) {
+              return next({ status: 404, message: 'Nu poti sterge imaginea default' })
+            }
+
+            await gfs.remove({ _id: req.params.id, root: 'images' }, async err => {
+              if( err ) {
+                console.log(err.stack)
+                return next( err )
+              }
+              await gfs.files.find({}).toArray(async (err, files) => {
+                if( err ) return next( err )
+                if( files[0] ) {
+                  let id = files[0]._id
+                  let batch = conn.collection('user').initializeUnorderedBulkOp()
+                  batch.find({ imageID: req.params.id }).update({ $set: { imageID: id } })
+                  await batch.execute(async (err, doc) => {
+                    if( err ) {
+                      console.log(err.stack)
+                      return next( err )
+                    }
+                    console.log(doc)
+                    console.log('nModified:', doc.nModified)
+                  })
+                  // User.updateMany({ imageID: req.params.id }, { $set: { imageID: id } }, { multi: true }, (err, doc) => {
+                  //   if( err ) return console.log( err.stack )
+                  // })
+                }
+              })
+              
+              return res.json({ message: 'Imaginea a fost stearsa cu succes' })
             })
-            // User.updateMany({ imageID: req.params.id }, { $set: { imageID: id } }, { multi: true }, (err, doc) => {
-            //   if( err ) return console.log( err.stack )
-            // })
-          }
-        })
-        return res.json({ message: 'Imaginea a fost stearsa cu succes' })
+            break;
+          } 
+        }
       })
     })
   } else {

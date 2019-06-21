@@ -10,13 +10,16 @@ passport.use('signup', new localStrategy({
   usernameField: 'email',
   passwordField: 'password'
 }, async (email, password, done) => {
+  console.log('Request_signup:', { email, password })
   try {
     let check = await UserModel.findOne({ email })
-    console.log("Check: ", check)
-    if( check ) return done(null, false, { status: 400, message: `Utilizatorul cu email-ul ${email} exista deja.` })
+    if( check ) return done(null, false, { status: 404, message: `Utilizatorul cu email-ul ${email} exista deja.` })
     else {
-      const user = await UserModel.create({ email, password });
-      return done(null, user)
+      let user = {
+        email,
+        password
+      }
+      await done(null, user, { status: 200, message: 'OK' })
     }
   } catch( error ) {
     done({ message: error.message });

@@ -83,7 +83,7 @@ db.on('connected', async (err) => {
         // return db.close()
       })
     }
-    // Check if there is an image
+    // Check if there is a default image
     const conn = mongoose.connection
     const Grid = require('gridfs-stream')
     const gfs = Grid(conn.db, mongoose.mongo)
@@ -95,17 +95,23 @@ db.on('connected', async (err) => {
           if( err ) console.log( err.stack )
           const source = fs.createReadStream(defaultImagePath)
           const fileName = buf.toString('hex') + path.extname('profile-img.jpg');
-          const target = gfs.createWriteStream({ 
+          const target = await gfs.createWriteStream({ 
             filename: fileName, 
             content_type: 'image/jpeg', 
+            metadata: 'default',
             root: 'images' 
           })
           let file = source.pipe(target)
-          User.updateMany({ imageID: null }, { $set: { imageID: file.id } }, { multi: true }, (err, doc) => {
+          await User.updateMany({ }, { $set: { imageID: file.id } }, { multi: true }, (err, doc) => {
             if( err ) return console.log( err.stack )
             if( !doc.ok ) return console.log('Error updating user image\n', doc)
             console.log('IMAGE: __OK__\n', doc)
           })
+        })
+      } else {
+        await User.updateMany({ imageID: null }, { $set: { imageID: files[0]._id } }, { multi: true }, (err, doc) => {
+          if( err ) return console.log( err.stack )
+          if( !doc.ok ) return console.log('Error updating user image')
         })
       }
     })
