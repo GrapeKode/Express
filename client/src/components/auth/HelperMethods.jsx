@@ -89,7 +89,7 @@ export default class HelperMethods extends React.Component {
     }, true)
   }
   deleteImage = id => {
-    return this.fetch(this.state.apiURI.getProfileImage, {
+    return this.fetch(this.state.apiURI.getProfileImage + id, {
       method: 'DELETE',
       ...this.state.defaultOptions
     }, true)
@@ -115,7 +115,7 @@ export default class HelperMethods extends React.Component {
       method: 'POST',
       ...this.state.defaultOptions,
       body: image
-    })
+    }, true)
   }
 
   fetch = async (url, options, noHeaders) => {
@@ -135,7 +135,7 @@ export default class HelperMethods extends React.Component {
       ;
     // if( res.hasOwnProperty('user') )
     //   return res
-    console.log('RES___:', res)
+    // console.log('RES___:', res)
     return res.ok || res.status !== 401 ? res.json() : {status: res.status, statusText: res.statusText}
   }
 

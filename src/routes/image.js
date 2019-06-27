@@ -168,6 +168,9 @@ router.get('/image/show/:id', passport.authenticate('jwt', { session: false }), 
 // POST new image
 router.post('/image', passport.authenticate('jwt', { session: false }), upload.single('profile'), (req, res, next) => {
   // console.log('REQ_file:', req.file)
+  if( req.file === undefined )
+    return next({ message: 'No file has been received' })
+  
   User.findOneAndUpdate({ _id: req.user._id }, { imageID: req.file.id }, { returnNewDocument: true })
     .exec((err, doc) => {
       if( err) return next( err )
@@ -215,14 +218,13 @@ router.delete('/image/:id', passport.authenticate('jwt', { session: false }), (r
                   batch.find({ imageID: req.params.id }).update({ $set: { imageID: id } })
                   await batch.execute(async (err, doc) => {
                     if( err ) {
-                      console.log(err.stack)
                       return next( err )
                     }
-                    console.log(doc)
                     console.log('nModified:', doc.nModified)
                   })
                   // User.updateMany({ imageID: req.params.id }, { $set: { imageID: id } }, { multi: true }, (err, doc) => {
                   //   if( err ) return console.log( err.stack )
+                  //   return res.json(doc)
                   // })
                 }
               })

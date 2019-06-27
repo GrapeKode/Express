@@ -48,7 +48,7 @@ conn.once('open', async err => {
   // })
 
   // Body parser
-  app.use(bodyParser.urlencoded({ extended: false }))
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: false }))
   app.use(methodOverride('_method'))
   app.use('/views', home)
 

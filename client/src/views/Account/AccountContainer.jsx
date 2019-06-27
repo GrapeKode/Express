@@ -98,6 +98,7 @@ export default class AccountContainer extends Component {
               isAdmin = {user.isAdmin}
               firstName = {user.firstName}
               lastName = {user.lastName}
+              imageID = {user.imageID}
               imageURL = {user.imageURL}
               uploadDate = {user.uploadDate}
               metadata = {user.metadata}
@@ -112,6 +113,7 @@ export default class AccountContainer extends Component {
               isAdmin = {user.isAdmin}
               firstName = {user.firstName}
               lastName = {user.lastName}
+              imageID = {user.imageID}
               imageURL = {user.imageURL}
               uploadDate = {user.uploadDate}
               metadata = {user.metadata}

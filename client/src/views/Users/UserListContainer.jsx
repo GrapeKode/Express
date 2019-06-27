@@ -148,7 +148,7 @@ export default class UserListContainer extends Component {
   handleSelectUser(key, event) {
     const { users, pagination } = this.state
 
-    if( event.target.name === 'selectAll' ) {
+    if( typeof key !== 'number' && key.target.name === 'selectAll' ) {
       key = Array(Object.keys(users[pagination.currentPage]).length).fill().map((_, i) => i)
       this.setState(prev => {
         const { selectedList, pagination } = prev
@@ -264,7 +264,7 @@ export default class UserListContainer extends Component {
       )
     }
 
-    const { isAdmin } = this.props
+    const { isAdmin, email } = this.props
     const users = this.state.users
     const { currentPage, lastPage, listNum } = this.state.pagination
     
@@ -288,7 +288,8 @@ export default class UserListContainer extends Component {
         if( this.state.selectedUser.includes(user._id) ) {
           checked = true
           classes = 'table-active'
-        }
+        } else if( user.email === email )
+          classes = 'table-success'
 
         userList.push(
           <tr 
@@ -302,7 +303,7 @@ export default class UserListContainer extends Component {
             }}>
               <input type="checkbox" className="mr-3" checked={checked} readOnly />
               <img 
-                alt={`Profile ${user.email}`}
+                alt={`Profile`}
                 src={user.imageURL} 
                 width='50' 
                 height='50' 

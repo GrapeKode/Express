@@ -74,21 +74,21 @@ export default class DashboardComponent extends Component {
         <div className="row">
           <div className="col-md-4 flex-center" title="Users" data-toggle="tooltip">
             <div className="text-center">
-              <i className="fas fa-users fa-3x"></i>
+              <i className="fas fa-users fa-3x text-info"></i>
               {this.state.isLoading ? loading : <h1>{this.state.users}</h1>}
               <p>Users</p>
             </div>
           </div>
           <div className="col-md-4 flex-center" title="Admins" data-toggle="tooltip">
             <div className="text-center">
-              <i className="fas fa-user-shield fa-3x"></i>
+              <i className="fas fa-user-shield fa-3x text-danger"></i>
               {this.state.isLoading ? loading : <h1>{this.state.admins}</h1>}
               <p>Admins</p>
             </div>
           </div>
           <div className="col-md-4 flex-center" title="Images" data-toggle="tooltip">
             <div className="text-center">
-              <i className="fas fa-images fa-3x"></i>
+              <i className="fas fa-images fa-3x text-success"></i>
               {this.state.isLoading ? loading : <h1>{this.state.images}</h1>}
               <p>Images</p>
             </div>

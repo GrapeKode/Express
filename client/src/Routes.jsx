@@ -45,7 +45,7 @@ export default class Routes extends Component {
           path="/sign-in"
         />
         <Route
-          component={Logout}
+          component={RestrictSecureRoute(Logout)}
           exact
           path="/logout"
         />

@@ -144,12 +144,13 @@ class SignUp extends Component {
       }).then(doc => {
         if( doc.hasOwnProperty('error') )
           this.setState({ submitError: doc.error.message })
-        else
+        else {
           this.setState({ submitError: false })
+          setTimeout(() => {
+            window.location.href = '/sign-in'
+          }, 500)
+        }
         this.setState({ isLoading: false })
-        setTimeout(() => {
-          window.location.href = '/sign-in'
-        }, 500)
       }).catch(err => {
         this.setState({ 
           isLoading: false,
