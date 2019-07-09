@@ -15,12 +15,12 @@ const assert = require('assert')
 const UserSchema = new Schema({
   email: {
     type: String,
-    required: [true, 'This field is required!'],
+    required: [true, 'is required'],
     unique: true
   },
   password: {
     type: String,
-    required: [true, 'This field is required!']
+    required: [true, 'is required']
   },
   firstName: {
     type: String,

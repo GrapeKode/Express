@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import HelperMethods from '../../components/auth/HelperMethods.jsx'
+import validate from '../../components/validators/validate'
 
 import { Dashboard as DashboardLayouts } from '../../layouts'
 import AccountContainer from './AccountContainer.jsx'
@@ -29,6 +30,7 @@ export default class Dashboard extends Component {
             isAdmin={user.isAdmin}
 
             helper={HelperMethods}
+            validate={validate}
           />
       </DashboardLayouts>
     )

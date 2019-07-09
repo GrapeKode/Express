@@ -13,6 +13,7 @@ export default class HelperMethods extends React.Component {
         referrer: 'no-referrer',
       },
       apiURI: {
+        logout: hostURL + '/auth/logout',
         currentUser: hostURL + '/current-user',
         getUser: hostURL + '/api/user/',
         getLimitedUser: hostURL + '/api/user?limit=',
@@ -46,8 +47,13 @@ export default class HelperMethods extends React.Component {
     return localStorage.getItem('id_token')
   }
 
-  logout = () => {
+  logout = async () => {
+    const res = await this.fetch(this.state.apiURI.logout, {
+      method: 'GET',
+      ...this.state.defaultOptions
+    })
     localStorage.removeItem('id_token')
+    return res
   }
 
   // GET method - IMAGE || USER
@@ -103,9 +109,9 @@ export default class HelperMethods extends React.Component {
       body
     })
   }
-  updateUser = body => {
-    return this.fetch(this.state.apiURI.getUser, {
-      method: 'POST',
+  updateUser = (id, body) => {
+    return this.fetch(this.state.apiURI.getUser + id, {
+      method: 'PUT',
       ...this.state.defaultOptions,
       body
     })
@@ -118,7 +124,7 @@ export default class HelperMethods extends React.Component {
     }, true)
   }
 
-  fetch = async (url, options, noHeaders) => {
+  fetch = async (url, options, noHeaders=false) => {
     const headers = {
       // Accept: 'application/x-www-form-urlencoded',
     }
@@ -132,9 +138,6 @@ export default class HelperMethods extends React.Component {
       headers,
       ...options
     }) // .then(this._checkStatus)
-      ;
-    // if( res.hasOwnProperty('user') )
-    //   return res
     // console.log('RES___:', res)
     return res.ok || res.status !== 401 ? res.json() : {status: res.status, statusText: res.statusText}
   }

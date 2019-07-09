@@ -21,6 +21,7 @@ export default class AccountContainer extends Component {
 
     // BINDS
     this.getUserInfo = this.getUserInfo.bind(this)
+    this.handleMessages = this.handleMessages.bind(this)
   }
 
   componentDidMount() {
@@ -54,13 +55,13 @@ export default class AccountContainer extends Component {
 
     this.setState(prev => {
       const newState = prev.messages;
-      newState.message.push(
+      newState.message =
         <div className={classes}>
           <strong className="mr-1">{title}</strong> 
           {message}
         </div>
-      )
       newState.showMessage = true
+      return { messages: newState }
     })
     this.forceUpdate()
     setTimeout(() => {
@@ -104,6 +105,7 @@ export default class AccountContainer extends Component {
               metadata = {user.metadata}
 
               helper = {this.props.helper}
+              handleMessages = {this.handleMessages}
             />
           </div>
           <div className="col-md-6">
@@ -119,6 +121,8 @@ export default class AccountContainer extends Component {
               metadata = {user.metadata}
               
               helper = {this.props.helper}
+              validate = {this.props.validate}
+              handleMessages = {this.handleMessages}
             />
           </div>
         </div>

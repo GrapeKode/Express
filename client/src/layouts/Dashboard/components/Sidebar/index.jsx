@@ -26,7 +26,9 @@ export default class Sidebar extends Component {
           <div className="text-center">
             <div className="userProfile"
               style={{
-                backgroundColor: '#808080',
+                backgroundColor: '#FFFFFF',
+                border: '2.5px solid #20BAC9',
+                boxShadow: '0 2.5px 5px 1px rgba(0, 0, 0, 0.2)',
                 backgroundImage: !!this.props.currentImageURL && 'url("http://localhost:5000/image/full/' + this.props.currentImageURL + '")'
               }}
             ></div>

@@ -126,7 +126,7 @@ export default props => {
                 checked={props.values.policy}
                 onChange={props.handleFieldChange}
               />
-              <label className="custom-control-label" htmlFor="remember">I have read the <a href="#Terms&Contidions">Terms and Conditions</a></label>
+              <label className="custom-control-label" htmlFor="remember">I have read the <a href="#Terms&Conditions">Terms and Conditions</a></label>
             </div>
             {submitButton}
             <div className="flex-between mb-3 mt-3">

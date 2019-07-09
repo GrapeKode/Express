@@ -383,6 +383,7 @@ export default class UserListContainer extends Component {
               className="form-control" 
               placeholder="Search user" 
               onChange={this.handleSearchUser}
+              autoFocus
             />
             <div className="input-group-append">
               <button className="btn btn-info" type="submit">Search</button>

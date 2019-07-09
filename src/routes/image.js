@@ -186,14 +186,6 @@ router.delete('/image/:id', passport.authenticate('jwt', { session: false }), (r
     return next({ status: 404, message: `Id-ul ${req.params.id} este incorect` })
 
   if( req.params.id ) {
-    // gfs.files.deleteMany({ _id: req.params.id }, err => {
-    //   if( err ) return next( err )
-    //   return res.json({ message: 'The image has been deleted successfully' })
-    // })
-    // gfs.files.deleteOne({ _id: req.params.id }, err => {
-    //   if( err ) return next( err )
-    //   return res.json({ message: 'The image has been deleted successfully' })
-    // })
     gfs.exist({ _id: req.params.id, root: 'images' }, async (err, found) => {
       if( err ) return next( err )
       if( !found ) return next({ status: 404, message: `Imaginea cu id-ul ${req.params.id} n-a fost gasita` })
@@ -213,19 +205,20 @@ router.delete('/image/:id', passport.authenticate('jwt', { session: false }), (r
               await gfs.files.find({}).toArray(async (err, files) => {
                 if( err ) return next( err )
                 if( files[0] ) {
-                  let id = files[0]._id
-                  let batch = conn.collection('user').initializeUnorderedBulkOp()
-                  batch.find({ imageID: req.params.id }).update({ $set: { imageID: id } })
-                  await batch.execute(async (err, doc) => {
-                    if( err ) {
-                      return next( err )
-                    }
-                    console.log('nModified:', doc.nModified)
-                  })
-                  // User.updateMany({ imageID: req.params.id }, { $set: { imageID: id } }, { multi: true }, (err, doc) => {
-                  //   if( err ) return console.log( err.stack )
-                  //   return res.json(doc)
+                  const id = files[0]._id
+                  // const batch = conn.collection('user').initializeUnorderedBulkOp()
+                  // console.log(batch)
+                  // batch.find({ imageID: req.params.id }).update({ $set: { imageID: id } })
+                  // await batch.execute(async (err, doc) => {
+                  //   if( err ) {
+                  //     return next( err )
+                  //   }
+                  //   console.log('nModified:', doc.nModified)
                   // })
+                  User.updateMany({ imageID: req.params.id }, { $set: { imageID: id } }, { multi: true }, (err, doc) => {
+                    if( err ) return console.log( err.stack )
+                    // return res.json(doc)
+                  })
                 }
               })
               

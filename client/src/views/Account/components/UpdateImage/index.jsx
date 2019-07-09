@@ -24,7 +24,7 @@ export default class UpdateImage extends Component {
 
   async updatePicture() {
     const { helper } = this.props
-    this.removePicture(true)
+    this.removePicture('update')
 
     const Helper = new helper()
     const formData = new FormData()
@@ -50,9 +50,9 @@ export default class UpdateImage extends Component {
   }
 
   async removePicture(force) {
-    const { helper, imageID, metadata } = this.props
+    const { helper, imageID, metadata, handleMessages } = this.props
     const Helper = new helper()
-    if( force === true ) {
+    if( force === 'update' ) {
       await Helper.deleteImage(imageID)
       return false
     }
@@ -68,9 +68,10 @@ export default class UpdateImage extends Component {
       await Helper.deleteImage(imageID)
         .then(doc => {
           console.log(doc)
-          alert('The image has been deleted successfully')
+          handleMessages('The image has been deleted successfully', 'success')
         }).catch(err => {
           console.error(err)
+          handleMessages("The image couldn't be removed")
         })
     }
   }
@@ -249,7 +250,7 @@ export default class UpdateImage extends Component {
           <button 
             className="btn btn-outline-danger text-uppercase"
             onClick={this.removePicture}
-            disabled={metadata === 'default' || imageID === null}
+            disabled={metadata === 'default' || !imageID}
             >Remove Picture</button>
         </div>
       </div>
