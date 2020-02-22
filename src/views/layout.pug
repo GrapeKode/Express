@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+html(xmlns="http://www.w3.org/1999/xhtml" lang="ro")
+  include _includes/head.pug
+  body
+    .container
+      block content
+      hr
+      #response(style={padding: '20px', width: '100%', height: '100%', background: 'rgb(51, 51, 51)', color: '#F0F0F0'})  Here will be shown the response from server.
+      hr
+    script(src="http://localhost:3000/static/js/main.js")
+
+    include _includes/footer.pug
