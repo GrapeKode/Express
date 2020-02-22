@@ -40,16 +40,16 @@ router.post('/login', async (req, res, next) => {
       req.login(user, { session: false }, error => {
         if( error ) return next( error )
         const body = { _id: user._id, email: user.email, isAdmin: user.isAdmin }
-        const token = jwt.sign({ user: body }, config.secret )
+        const token = jwt.sign({ user: body }, config.secret.privateKEY, config.secret.signOptions ) // { payLoad, privateKEY, signOptions } 
 
         // Add the token to whitelist
-        let iat = jwt.decode(token).iat
-        let jti = cache.get(iat)
-        // Replace old token
-        if( !jti )
-          cache.put(iat, token)
-        else if( jti !== token )
-          cache.put(iat, token)
+        cache.put(user._id, token)
+        // let cache_jwt = cache.get(user._id)
+        // // Replace old token
+        // if( !cache_jwt )
+        //   cache.put(user._id, token)
+        // else if( cache_jwt !== token )
+        //   cache.put(user._id, token)
 
         return res.json({ 
           token,
@@ -60,14 +60,6 @@ router.post('/login', async (req, res, next) => {
       return next( err )
     }
   })(req, res, next)
-})
-
-// Logout
-router.get('/logout', async (req, res, next) => {
-  let jti = jwt.decode(req.header('x-auth')).iat // 4
-  // let cache_jwt = cache.get(jti)
-  cache.del(jti)
-  res.json({ user: req.user, message: 'Logged out' })
 })
 
 module.exports = router

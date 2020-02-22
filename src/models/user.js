@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const config = require('../config')
-const db = mongoose.createConnection(config.mongoURI + '/user', { useNewUrlParser: true })
+const db = mongoose.createConnection(config.mongoURI + '/user', { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true })
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
 

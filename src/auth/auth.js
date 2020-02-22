@@ -3,7 +3,6 @@ const localStrategy = require('passport-local').Strategy
 const UserModel = require('../models/user')
 const config = require('../config')
 const jwt = require('jsonwebtoken')
-//const blacklist = require('express-jwt-blacklist')
 const cache = require('memory-cache')
 
 // Passport middleware to handle user registration
@@ -45,23 +44,20 @@ const JWTstrategy = require('passport-jwt').Strategy
 const ExtractJWT = require('passport-jwt').ExtractJwt
 
 passport.use('jwt', new JWTstrategy({
-  secretOrKey: config.secret, // Secrete Key
+  secretOrKey: config.secret.publicKEY, // Public Key
   jwtFromRequest: ExtractJWT.fromHeader('x-auth')
-  //isRevoked: blacklist.isRevoked
 }, (token, done) => {
   try {
-    // Verify the token
-    let jti = cache.get(token.iat)
+    let cache_token = cache.get(token.user._id)
 
-    if( !jti ) 
-      return done(null, false, { status: 401, message: 'Authentication failed' })
+    if( !cache_token ) 
+      return done(null, false, { message: 'Authentication failed' })
     else {
-      let jti_iat = jwt.decode(jti).iat
-      if( jti_iat !== token.iat )
-        return done(null, false, { status: 401, message: 'Authentication failed' })
+      let cache_iat = jwt.decode(cache_token).iat
+      if( cache_iat !== token.iat )
+        return done(null, false, { message: 'Authentication failed' })
       return done(null, token.user)
     }
-      
   } catch( err ) {
     done( err )
   }

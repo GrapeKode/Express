@@ -13,7 +13,7 @@ const app = express()
 const UserModel = require('./models/user')
 
 // Connect to mongoDB
-mongoose.connect(config.mongoURI + '/user', { useNewUrlParser: true }, (err) => {
+mongoose.connect(config.mongoURI + '/user', { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }, (err) => {
   if( err ) throw err;
   console.log('Mongoose connected!')
 })
