@@ -14,7 +14,7 @@
   "author": "Ruben Ilciuc",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.7.9",
+    "angular": "^1.8.0",
     "assert": "^2.0.0",
     "axios": "^0.19.0",
     "bcrypt": "^3.0.6",
