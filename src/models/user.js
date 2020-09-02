@@ -1,48 +1,45 @@
-const mongoose = require('mongoose')
-const config = require('../config')
-const db = mongoose.createConnection(
-  config.mongoURI + '/user', 
-  { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true }
-)
+const mongoose = require("mongoose")
+const config = require("../config")
+const db = mongoose.createConnection(config.mongoURI + "/user", { useCreateIndex: true, useFindAndModify: false, useNewUrlParser: true })
 const conn = mongoose.connection
 const Schema = mongoose.Schema
-const bcrypt = require('bcrypt')
-const crypto = require('crypto')
-const path = require('path')
-const fs = require('fs')
-const assert = require('assert')
+const bcrypt = require("bcrypt")
+const crypto = require("crypto")
+const path = require("path")
+const fs = require("fs")
+const assert = require("assert")
 
 const UserSchema = new Schema({
   email: {
     type: String,
-    required: [true, 'is required'],
-    unique: true
+    required: [true, "is required"],
+    unique: true,
   },
   password: {
     type: String,
-    required: [true, 'is required']
+    required: [true, "is required"],
   },
   firstName: {
     type: String,
-    default: "First Name"
+    default: "First Name",
   },
   lastName: {
     type: String,
-    default: "Last Name"
+    default: "Last Name",
   },
   isAdmin: {
     type: Boolean,
-    default: false
+    default: false,
   },
   imageID: {
     type: String,
-    default: null
-  }
+    default: null,
+  },
 })
 
 // This is called a pre-hook, before the user information is saved in the database
 // this function will be called, we'll get the plain text password, hash it and store it.
-UserSchema.pre('save', async function(next) {
+UserSchema.pre("save", async function (next) {
   const user = this
   const hash = await bcrypt.hash(this.password, 10)
   this.password = hash
@@ -50,68 +47,68 @@ UserSchema.pre('save', async function(next) {
 })
 
 // We'll use this later on to make sure that the user trying to log in has the correct credentials
-UserSchema.methods.isValidPassword = async function(password) {
-  const user = this;
-  //Hashes the password sent by the user for login and checks if the hashed password stored in the 
+UserSchema.methods.isValidPassword = async function (password) {
+  const user = this
+  //Hashes the password sent by the user for login and checks if the hashed password stored in the
   //database matches the one sent. Returns true if it does else false.
-  const compare = await bcrypt.compare(password, user.password);
-  return compare;
+  const compare = await bcrypt.compare(password, user.password)
+  return compare
 }
 
-const User = mongoose.model('user', UserSchema) // db
+const User = mongoose.model("user", UserSchema) // db
 
 const user = new User({
-  email: "ruben.ilciuc@assist.ro",
-  password: "R4u1B2e7N",
-  firstName: "Ruben",
-  lastName: "Ilciuc",
-  isAdmin: true
+  email: "ghetes.damaris.ligia@student.usv.ro",
+  password: "Test123!",
+  firstName: "Damaris-Ligia",
+  lastName: "Ghetes",
+  isAdmin: true,
 })
 
-let defaultImagePath = './public/img/profile-img.jpg'
+let defaultImagePath = "./public/img/profile-img.jpg"
 
-db.on('connected', async (err) => {
-  if( err ) return console.error( err )
+db.on("connected", async (err) => {
+  if (err) return console.error(err)
   // Check if there is an admin
-  await User.countDocuments({isAdmin: true}, async (err, count) => {
-    if( err ) return console.log(err.stack)
-    if( !count ) {
+  await User.countDocuments({ isAdmin: true }, async (err, count) => {
+    if (err) return console.log(err.stack)
+    if (!count) {
       await User.create(user, async (err, doc) => {
-        if( err ) return console.error( err )
+        if (err) return console.error(err)
         // console.log(doc)
-        console.log('USER: __OK__')
+        console.log("USER: __OK__")
         // return db.close()
       })
     }
     // Check if there is a default image
     const conn = mongoose.connection
-    const Grid = require('gridfs-stream')
+    const Grid = require("gridfs-stream")
     const gfs = Grid(conn.db, mongoose.mongo)
-    gfs.collection('images')
-    await gfs.files.find({}).toArray( async (err, files) => {
-      if( err ) return console.log( err.stack )
-      if( !files[0] ) {
+    gfs.collection("images")
+    await gfs.files.find({}).toArray(async (err, files) => {
+      if (err) return console.log(err.stack)
+      if (!files[0]) {
         await crypto.randomBytes(16, async (err, buf) => {
-          if( err ) console.log( err.stack )
+          if (err) console.log(err.stack)
           const source = fs.createReadStream(defaultImagePath)
-          const fileName = buf.toString('hex') + path.extname('profile-img.jpg');
-          const target = await gfs.createWriteStream({ 
-            filename: fileName, 
-            content_type: 'image/jpeg', 
-            metadata: 'default',
-            root: 'images' 
+          const fileName = buf.toString("hex") + path.extname("profile-img.jpg")
+          const target = await gfs.createWriteStream({
+            filename: fileName,
+            content_type: "image/jpeg",
+            metadata: "default",
+            root: "images",
           })
           let file = source.pipe(target)
-          await User.updateMany({ }, { $set: { imageID: file.id } }, { multi: true }, (err, doc) => {
-            if( err ) return console.log( err.stack )
-            if( !doc.ok ) return console.log('Error updating user image\n', doc)
-            console.log('IMAGE: __OK__\n', doc)
+          await User.updateMany({}, { $set: { imageID: file.id } }, { multi: true }, (err, doc) => {
+            if (err) return console.log(err.stack)
+            if (!doc.ok) return console.log("Error updating user image\n", doc)
+            console.log("IMAGE: __OK__\n", doc)
           })
         })
       } else {
         await User.updateMany({ imageID: null }, { $set: { imageID: files[0]._id } }, { multi: true }, (err, doc) => {
-          if( err ) return console.log( err.stack )
-          if( !doc.ok ) return console.log('Error updating user image')
+          if (err) return console.log(err.stack)
+          if (!doc.ok) return console.log("Error updating user image")
         })
       }
     })

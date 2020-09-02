@@ -11,7 +11,7 @@ export default class Footer extends Component {
 
         }}
       >
-        &copy; 2019 GrapeKode
+        &copy; 2020 Ghetes Damaris-Ligia
       </footer>
     )
   }

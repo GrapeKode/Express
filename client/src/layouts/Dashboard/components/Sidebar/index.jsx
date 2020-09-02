@@ -20,7 +20,7 @@ export default class Sidebar extends Component {
           backgroundColor: '#FFFFFF'
         }}>
           <img src="/gk.png" width='50' height='50' alt="Logo" />
-          <h3 className="ml-1" style={{ paddingTop: '8px' }}>GrapeKode</h3>
+          <h3 className="ml-1" style={{ paddingTop: '8px' }}>Ghetes Damaris-Ligia</h3>
         </div>
         <div className="userInfo flex-center">
           <div className="text-center">
