@@ -1,10 +1,7 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router-dom'
-
 export default class DashboardComponent extends Component {
   constructor(props) {
     super(props)
-    // console.log('Dashboard_Container_props:', props)
     this.state = {
       user: 0,
       admins: 0,
@@ -12,7 +9,6 @@ export default class DashboardComponent extends Component {
       isLoading: false
     }
 
-    // BINDS
     this.getNumOfUsers = this.getNumOfUsers.bind(this)
     this.getNumOfImages = this.getNumOfImages.bind(this)
   } 
@@ -45,10 +41,8 @@ export default class DashboardComponent extends Component {
 
   async getNumOfImages() {
     this.setState({ isLoading: true })
-
     const helper = new this.props.helper()
 
-    // Implementeaza afisarea tuturor imaginilor pentru valoarea limita '0'
     await helper.getAllImages(50)
       .then(async doc => {
         const image = await Object.keys(doc).map(key => parseInt(key) + 1)

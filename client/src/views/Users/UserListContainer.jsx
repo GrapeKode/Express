@@ -3,11 +3,9 @@ import React, { Component } from 'react'
 import AuthHelperMethods from '../../components/auth/HelperMethods.jsx'
 import validate from '../../components/validators/validate'
 
-// Components
 import { 
   AddUser,
   DeleteUser,
-  // UpdateUser
 } from './components'
 
 export default class UserListContainer extends Component {
@@ -29,8 +27,6 @@ export default class UserListContainer extends Component {
       },
       isLoading: false
     }
-
-    // Binds
     this.getAllUsers = this.getAllUsers.bind(this)
     this.getProfileImage = this.getProfileImage.bind(this)
     this.handleFieldChange = this.handleFieldChange.bind(this)
@@ -50,7 +46,6 @@ export default class UserListContainer extends Component {
 
     await helperMethods.getAllUsers(0)
       .then(async doc => {
-        // let page = 0
         await Object.keys(doc).map(async key => {
           await this.setState(prev => {
             const newState = prev.users,
@@ -69,13 +64,11 @@ export default class UserListContainer extends Component {
         })
 
         await this.getProfileImage(this.state.pagination.currentPage)
-        // console.log('STATE_USERS:', this.state.users)
         return this.setState({ isLoading: false })
       })
   }
 
   async getProfileImage(page, index=null, id=null) {
-    // alert('Page: ' + page + '\nIndex: ' + index)
     const helperMethods = new AuthHelperMethods()
     const users = this.state.users[page]
 
@@ -87,12 +80,10 @@ export default class UserListContainer extends Component {
       if( users[key].imageID === undefined ) return false
       await helperMethods.getProfileImage(users[key].imageID)
         .then(doc => {
-          // handle errors
-          // Codes...
 
           this.setState(prev => {
             const newState = prev.users
-            // console.log('newState_PREV', newState)
+
             newState[page][key].imageURL = 'http://localhost:5000/image/full/' + doc.filename
             return { users: newState }
           })
@@ -119,7 +110,6 @@ export default class UserListContainer extends Component {
   }
 
   handlePagination(event) {
-    // console.log(this.state.users)
     if( event.target.className.match('disabled') )
       return false
     const { value } = event.target.parentElement.attributes.data
@@ -129,7 +119,6 @@ export default class UserListContainer extends Component {
         const newState = prev.pagination
         newState.currentPage = newState.currentPage + parseInt(value)
         if( newState.currentPage >= 0 && newState.currentPage <= newState.lastPage ) {
-          // alert(newState.currentPage + ' || ' + newState.lastPage)
           this.getProfileImage(newState.currentPage)
           return { pagination: newState }
         }
@@ -138,7 +127,6 @@ export default class UserListContainer extends Component {
       this.setState(prev => {
         const newState = prev.pagination
         newState.currentPage = parseInt(value)
-        // alert(newState.currentPage)
         this.getProfileImage(newState.currentPage)
         return { pagination: newState }
       })
@@ -174,7 +162,6 @@ export default class UserListContainer extends Component {
         })
       }
     } else {
-      // key = parseInt(event.target.parentElement.accessKey.split('$')[1])
       if( key !== key ) return false
       this.setState(prev => {
         const newState = prev.selectedUser
@@ -226,7 +213,6 @@ export default class UserListContainer extends Component {
     pagination.lastPage = index
     this.setState({ users: searchUser, pagination  })
     setTimeout(() => {
-      // console.log('USERS:_', this.state.users)
       this.getProfileImage(this.state.pagination.currentPage)
     }, 300)
   }
@@ -346,7 +332,6 @@ export default class UserListContainer extends Component {
     const prevPage = currentPage === 0 && 'disabled'
     const nextPage = currentPage === lastPage && 'disabled'
 
-    // console.log('Pages:', this.state.pages, '\nUser_List:', userList)
     return (
       <div className="newContainer">
         { messages.showMessage && messages.message }

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 import _ from 'underscore'
 import schema from './schema'
-// import validate from '../../../../components/validators/validate'
 
 export default class AddUser extends Component {
   constructor(props) {
@@ -27,8 +26,6 @@ export default class AddUser extends Component {
       submitError: null,
       isLoading: false
     }
-    
-    // Binds
     this.handleFieldChange = this.handleFieldChange.bind(this)
     this.handleFormSubmit = this.handleFormSubmit.bind(this)
     this.validateForm = this.validateForm.bind(this)
@@ -125,7 +122,6 @@ export default class AddUser extends Component {
     const showPasswordError = touched.password && errors.password
 
     let submitButton, submitInfo = '';
-    // alert(`LOADING: ${props.isLoading}`)
 
     if( isValid ) {
       submitButton = 
@@ -238,7 +234,7 @@ export default class AddUser extends Component {
                       onChange={this.handleFieldChange}
                     />
                   </div>
-                  { // Members don't have access to add an ADMIN
+                  { 
                     this.props.isAdmin && 
                     <div className="custom-control custom-switch text-left mb-3">
                       <input 

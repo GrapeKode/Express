@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 
 import validate from '../../components/validators/validate.js'
 import _ from 'underscore'
-// import validators from 'common/validators'
 import schema from './schema'
 import AuthHelperMethods from '../../components/auth/HelperMethods.jsx'
 
@@ -29,7 +28,6 @@ export default class SignIn extends Component {
       isLoading: false,
       submitError: null
     }
-    // Binds
     this.validateForm = this.validateForm.bind(this)
     this.handleFieldChange = this.handleFieldChange.bind(this)
     this.handleSignIn = this.handleSignIn.bind(this)
@@ -43,7 +41,6 @@ export default class SignIn extends Component {
 
     newState.errors = errors || {}
     newState.isValid = errors ? false : true
-    // newState.values = values
 
     this.setState( newState )
   }, 300)
@@ -100,8 +97,6 @@ export default class SignIn extends Component {
       }).then(res => {
         return res.json()
       }).then(doc => {
-        // const Auth = AuthHelperMethod()
-        // console.log('Doc:', doc)
         if( doc.hasOwnProperty('error') )
           this.setState({ submitError: doc.error.message })
         else {
@@ -122,23 +117,17 @@ export default class SignIn extends Component {
   }
 
   handleAlertMessages(message, className='danger', title='') {
-    // const classList = `alert alert-${className} alert-dismissible`
     const color = `text-${className} mr-5`
     return(
       <small className={color}> 
         <strong className='mr-1'>{title}</strong> 
          {message}
       </small>
-      // <div className={classList}>
-      //   {/* <button type="button" className="close" data-dismiss="alert">&times;</button> */}
-      //   <strong>{title}</strong> {message}
-      // </div>
     )
   }
 
   render() {
     const {
-      // response,
       values,
       touched,
       errors,
@@ -146,11 +135,6 @@ export default class SignIn extends Component {
       submitError,
       isLoading
     } = this.state;
-    // alert('Values: ' + JSON.stringify(values))
-    // alert('isValid: ' + JSON.stringify(isValid))
-    // alert('submitError: ' + JSON.stringify(submitError))
-    // alert('Errors: ' + JSON.stringify(errors))
-
     const showEmailError = touched.email && errors.email;
     const showPasswordError = touched.password && errors.password;
 
@@ -158,13 +142,10 @@ export default class SignIn extends Component {
       <SignInContainer
         showEmailError={showEmailError}
         showPasswordError={showPasswordError}
-        
-        // response={response}
         values={values}
         isValid={isValid}
         submitError={submitError}
         isLoading={isLoading}
-
         handleFieldChange={this.handleFieldChange}
         handleSignIn={this.handleSignIn}
         handleAlertMessages={this.handleAlertMessages}

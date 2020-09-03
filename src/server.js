@@ -12,12 +12,12 @@ mongoose.Promise = global.Promise
 const conn = mongoose.connection
 
 conn.on("error", (err) => {
-  return console.log("MongoDB connection error:", err.stack)
+  return console.info("MongoDB connection error:", err.stack)
 })
 
 conn.once("open", async (err) => {
   if (err) return console.log(err.stack)
-  console.log("MongoDB connected successfully")
+  console.info("MongoDB connected successfully")
 
   const app = express()
   const UserModel = require("./models/user")
@@ -25,17 +25,12 @@ conn.once("open", async (err) => {
   const user = require("./routes/user")
   const secureRoute = require("./routes/secure-routes")
   const image = require("./routes/image")
-  const home = require("./routes/views")
 
   app.use(cors())
   app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }))
   app.use(methodOverride("_method"))
-  app.use("/views", home)
 
   require("./auth/auth")
-
-  app.set("views", path.join(__dirname, "views"))
-  app.set("view engine", "pug")
 
   app.use("/static", express.static("public"))
   app.use("/auth", routes)

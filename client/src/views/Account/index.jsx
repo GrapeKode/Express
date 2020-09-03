@@ -13,8 +13,6 @@ export default class Dashboard extends Component {
     this.state = {
       isLoading: false
     }
-    
-    // Binds
   }
 
   render() {

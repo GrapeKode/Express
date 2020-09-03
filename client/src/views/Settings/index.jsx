@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 
-import HelperMethods from '../../components/auth/HelperMethods.jsx'
-
 import { Dashboard as DashboardLayouts } from '../../layouts'
 
 
@@ -11,8 +9,6 @@ export default class Dashboard extends Component {
     this.state = {
       isLoading: false
     }
-    
-    // Binds
   }
 
   render() {

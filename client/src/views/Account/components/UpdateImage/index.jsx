@@ -11,7 +11,6 @@ export default class UpdateImage extends Component {
       isLoading: false
     }
 
-    // BINDS
     this.removePicture = this.removePicture.bind(this)
     this.updatePicture = this.updatePicture.bind(this)
     this.handleFormSubmit = this.handleFormSubmit.bind(this)
@@ -19,7 +18,6 @@ export default class UpdateImage extends Component {
   }
 
   async componentDidMount() {
-    // this.setState({ image: { filename: this.props.imageURL }, isLoading: false })
   }
 
   async updatePicture() {
@@ -135,11 +133,6 @@ export default class UpdateImage extends Component {
       this.setState({ messages: '' })
     }, 5000);
   }
-
-  // componentDidUpdate(prev) {
-  //   if( this.props.imageURL !== prev.imageURL )
-  //     this.setState({ image: { filename: this.props.imageURL }, isLoading: false })
-  // }
 
   render() {
     const {

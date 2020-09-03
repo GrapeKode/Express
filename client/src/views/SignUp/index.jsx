@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
-// import { Redirect } from 'react-router-dom'
 
 import validate from '../../components/validators/validate.js'
 import _ from 'underscore'
-// import validators from 'common/validators'
 
 import schema from './schema'
 
@@ -38,8 +36,6 @@ class SignUp extends Component {
       isLoading: false,
       submitError: null
     }
-
-    // Binds
     this.signUp = this.signUp.bind(this)
     this.validateForm = this.validateForm.bind(this)
     this.handleFieldChange = this.handleFieldChange.bind(this)
@@ -84,7 +80,6 @@ class SignUp extends Component {
 
     newState.errors = errors || {}
     newState.isValid = errors ? false : true
-    // newState.values = values
 
     this.setState(newState)
   }, 300)
@@ -158,21 +153,15 @@ class SignUp extends Component {
          })
       })
     }
-    // event.preventDefault();
   }
 
   handleAlertMessages(message, className='danger', title='') {
-    // const classList = `alert alert-${className} alert-dismissible`
     const color = `text-${className} mr-5`
     return(
       <small className={color}> 
         <strong className='mr-1'>{title}</strong> 
          {message}
       </small>
-      // <div className={classList}>
-      //   {/* <button type="button" className="close" data-dismiss="alert">&times;</button> */}
-      //   <strong>{title}</strong> {message}
-      // </div>
     )
   }
 
@@ -219,30 +208,3 @@ class SignUp extends Component {
 }
 
 export default SignUp;
-
-
-/**
- * handleSignUp
- */
-    // try {
-    //   const { values } = this.state
-
-    //   this.setState({ isLoading: true })
-
-    //   signUp({
-    //     firstName: values.firstName,
-    //     lastName: values.lastName,
-    //     email: values.email,
-    //     password: values.password
-    //   })
-
-    //   alert('HERE!')
-
-    // } catch ( err ) {
-    //   this.setState({
-    //     isLoading: false,
-    //     submitError: err
-    //   })
-    //   alert(JSON.stringify(err))
-    //   console.log('CATCH_ERROR:', err)
-    // }

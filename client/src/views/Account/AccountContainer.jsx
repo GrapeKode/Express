@@ -1,14 +1,11 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router-dom'
-
-// imports
 import {
   UpdateImage,
   UpdateUser
 } from './components'
 
 export default class AccountContainer extends Component {
-  constructor(props) { // currentUserId, email, isAdmin, helper
+  constructor(props) { 
     super(props)
     this.state = {
       user: {},
@@ -19,7 +16,6 @@ export default class AccountContainer extends Component {
       isLoading: false
     }
 
-    // BINDS
     this.getUserInfo = this.getUserInfo.bind(this)
     this.handleMessages = this.handleMessages.bind(this)
   }

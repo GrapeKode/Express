@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
-// Restriction For Secure Routes "nameOfFunction(ComponentOfSecureRoute)"
 import RestrictSecureRoute from './components/auth/RestrictSecureRoute.jsx'
 
-// Views
 import SignUp from './views/SignUp'
 import SignIn from './views/SignIn'
 import UserList from './views/Users'

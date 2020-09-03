@@ -10,7 +10,7 @@ export default class Topbar extends Component {
           <h3>{title}</h3>
         </div>
         <div className="text-right">
-          <Link to="/logout"><i className="fas fa-sign-in-alt fa-1x"></i></Link>
+          <Link to="/logout">Logout<i className="fas fa-sign-in-alt fa-1x"></i></Link>
         </div>
       </div>
     )

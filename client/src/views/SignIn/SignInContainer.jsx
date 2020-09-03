@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 
 export default props => {
   let submitButton, submitInfo = '';
-  // alert(`LOADING: ${props.isLoading}`)
 
   if( props.isValid ) {
     submitButton = 

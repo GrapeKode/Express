@@ -8,8 +8,6 @@ export default class AddUser extends Component {
       submitInfo: [],
       isLoading: false
     }
-    
-    // Binds
     this.handleDeleteUser = this.handleDeleteUser.bind(this)
   }
 
