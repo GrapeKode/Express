@@ -55,7 +55,7 @@ UserSchema.methods.isValidPassword = async function (password) {
   return compare
 }
 
-const User = mongoose.model("user", UserSchema) // db
+const User = mongoose.model("user", UserSchema)
 
 const user = new User({
   email: "ghetes.damaris.ligia@student.usv.ro",
@@ -69,18 +69,13 @@ let defaultImagePath = "./public/img/profile-img.jpg"
 
 db.on("connected", async (err) => {
   if (err) return console.error(err)
-  // Check if there is an admin
   await User.countDocuments({ isAdmin: true }, async (err, count) => {
     if (err) return console.log(err.stack)
     if (!count) {
       await User.create(user, async (err, doc) => {
         if (err) return console.error(err)
-        // console.log(doc)
-        console.log("USER: __OK__")
-        // return db.close()
       })
     }
-    // Check if there is a default image
     const conn = mongoose.connection
     const Grid = require("gridfs-stream")
     const gfs = Grid(conn.db, mongoose.mongo)
