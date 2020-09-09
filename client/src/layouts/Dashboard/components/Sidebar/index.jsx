@@ -12,21 +12,20 @@ export default class Sidebar extends Component {
   render() {
     const currentUser = { ...this.props.currentUser }
     return (
-      <div className="col-lg-2 bg-light" style={{ overflowY: "scroll" }}>
+      <div className="col-lg-2 bg-light" style={{ overflowY: "auto", borderRight: "1px solid #123456", boxShadow: "22.5px 22px 5px 1px rgba(0, 0, 0, 1) !important" }}>
         <div
           className="flex-center"
           style={{
             borderBottom: "1px solid #C0C0C0",
             padding: "5px",
             backgroundColor: "#FFFFFF",
+            height: "60px",
           }}
         >
-          <div className="flex-center" style={{ width: "100%" }}>
-            <img src="/eco-friendly.png" width="auto" height="80" alt="Logo" />
+          <div className="" style={{ width: "100%", display: "flex", alignItems: "center" }}>
+            <img src="/icon-ri.png" width="auto" height="45" alt="Logo" />
+            <h3 className="ml-2">Proiect Practica</h3>
           </div>
-          <h3 className="ml-1" style={{ paddingTop: "8px" }}>
-            Proiect practica
-          </h3>
         </div>
         <div className="userInfo flex-center">
           <div className="text-center">
