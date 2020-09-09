@@ -58,10 +58,10 @@ UserSchema.methods.isValidPassword = async function (password) {
 const User = mongoose.model("user", UserSchema)
 
 const user = new User({
-  email: "ghetes.damaris.ligia@student.usv.ro",
+  email: "ruben.ilciuc@student.usv.ro",
   password: "Test123!",
-  firstName: "Damaris-Ligia",
-  lastName: "Ghetes",
+  firstName: "Ruben",
+  lastName: "Ilciuc",
   isAdmin: true,
 })
 
