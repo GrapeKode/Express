@@ -43,7 +43,7 @@
     "passport-jwtr": "^3.1.0",
     "passport-local": "^1.0.0",
     "passport-trusted-header": "^1.1.0",
-    "pug": "^2.0.3",
+    "pug": "^3.0.1",
     "qs": "^6.7.0",
     "recompose": "^0.30.0",
     "redis": "^2.8.0",
